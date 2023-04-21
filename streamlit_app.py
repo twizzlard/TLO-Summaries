@@ -223,7 +223,7 @@ def process_text(text):
 
     for i in range(len(sections)):
         st.write(f"Section {i+1}: {sectionheadings[i]}")
-        st.write(sections[i])
+        st.write(f"\t{sections[i]}")
 
 
     dfSections = pd.DataFrame(sections, sectionheadings)
