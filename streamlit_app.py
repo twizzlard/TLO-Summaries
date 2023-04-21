@@ -223,8 +223,8 @@ def process_text(text):
     sectionheadings = re.findall(pattern, text)
     sectionheadings = [x.strip() for x in sectionheadings]
 
-    for i in range(len(sections)):
-        st.write(f"Parsing Section {i+1}: {sectionheadings[i]}")
+#     for i in range(len(sections)):
+#         st.write(f"Parsing Section {i+1}: {sectionheadings[i]}")
 
 
     dfSections = pd.DataFrame(sections, sectionheadings)
