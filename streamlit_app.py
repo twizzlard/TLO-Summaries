@@ -245,6 +245,8 @@ def process_pdf(file_data):
 
     dfList.append(df)
     
+    dfSections.apply(lambda x: whichHeading(x['Heading'], x['Content']), axis=1)
+    
     df = pd.concat(dfList)
     
     df[0] = df[0].str.strip()
