@@ -264,4 +264,4 @@ if uploaded_file is not None:
     
     # Offer a download link for the CSV file
     st.markdown('### Download CSV')
-    st.download_button('Download CSV', data=df, file_name='output.csv', mime=None, key=None, help=None, on_click=None, args=None, kwargs=None, *, disabled=False, use_container_width=False)
+    st.download_button('Download CSV', data=df, file_name='output.csv')
