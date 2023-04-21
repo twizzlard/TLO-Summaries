@@ -264,7 +264,7 @@ if uploaded_file is not None:
     df = process_pdf(file_data)
     
     # Display the DataFrame
-    st.write(df)
+#     st.write(df)
     
     # Offer a download link for the CSV file
     st.markdown('### Download CSV')
