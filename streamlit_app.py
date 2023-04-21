@@ -205,7 +205,6 @@ def process_pdf(file_data):
     pdf_file.close()
 
     # Print the extracted text
-    st.write('Text')
     st.write(text[:100])
 
     headings = ['Next Up', 'General Information', 'Notes', 'Client Case Policies', 'Property Information',
@@ -238,8 +237,7 @@ def process_pdf(file_data):
     fields = [field01, field02]
 
     fields = [x.strip() for x in fields]
-    fields
-
+    
     df = pd.DataFrame(fields)
 
     df.index = ['Document Number', 'Document Creation Date/Time'
