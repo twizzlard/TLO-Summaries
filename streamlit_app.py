@@ -222,8 +222,7 @@ def process_text(text):
     sectionheadings = [x.strip() for x in sectionheadings]
 
     for i in range(len(sections)):
-        st.write(f"Section {i+1}: {sectionheadings[i]}")
-        st.write(f"\t{sections[i]}")
+        st.write(f"Parsing Section {i+1}: {sectionheadings[i]}")
 
 
     dfSections = pd.DataFrame(sections, sectionheadings)
