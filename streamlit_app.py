@@ -246,7 +246,7 @@ def process_text(text):
 
     df.index = ['Document Number', 'Document Creation Date/Time'
                ]
-
+    
     dfList.append(df)
     
     dfSections.apply(lambda x: whichHeading(x['Heading'], x['Content']), axis=1)
@@ -256,7 +256,7 @@ def process_text(text):
     df[0] = df[0].str.strip()
     
     df = df.T
-    
+
     return df.to_csv(index=False).encode('utf-8')
     
 st.title('PDF Processor')
