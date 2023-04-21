@@ -249,7 +249,7 @@ def process_pdf(file_data):
     
     df = df.T
     
-    return df.to_csv('Summary Output TrackOps Demo.csv', index=False)
+    return df.to_csv('Summary Output TrackOps Demo.csv', index=False).encode('utf-8')
     
 st.title('PDF Processor')
 uploaded_file = st.file_uploader('Upload a PDF file', type='pdf')
