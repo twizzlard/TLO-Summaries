@@ -168,7 +168,7 @@ def getPropertyInfo(section):
     dfList.append(df)
     return df
 
-def process_pdf(uploaded_file):
+def process_pdf(file_data):
 
     # Open the PDF file in read binary mode
 #     pdf_file = open(uploaded_file, 'rb')
@@ -257,9 +257,9 @@ st.title('PDF Processor')
 uploaded_file = st.file_uploader('Upload a PDF file', type='pdf')
 
 if uploaded_file is not None:
-    uploaded_file = uploaded_file.read()
+    file_data = io.BytesIO(uploaded_file.read())
     # Process the PDF file
-    df = process_pdf(uploaded_file)
+    df = process_pdf(file_data)
     
     # Display the DataFrame
     st.write(df)
