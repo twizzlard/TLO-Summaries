@@ -26,6 +26,8 @@ def whichHeading(heading, content):
         getSubjectInfo(content)
     elif heading == 'Employer Information':
         getEmployerInfo(content)
+    elif heading == 'Connections':
+        pass
     else:
         st.write('Unrecognized heading:', heading)
         
