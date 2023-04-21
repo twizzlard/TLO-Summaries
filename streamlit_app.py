@@ -190,7 +190,7 @@ def process_pdf(file_data):
 
     # Loop through each page in the PDF file
     for page in PDFPage.get_pages(pdf_file):
-        st.write(page)
+#         st.write(page)
         # Process the current page
         pdf_interpreter.process_page(page)
 
@@ -205,8 +205,12 @@ def process_pdf(file_data):
     pdf_file.close()
 
     # Print the extracted text
-    st.write(text)
+    st.write(text[:100])
+    st.write(text[-100:])
+    
+    return text
 
+def process_text(text):
     headings = ['Next Up', 'General Information', 'Notes', 'Client Case Policies', 'Property Information',
                 'Vehicle Information', 'Subject Information', 'Employer Information', 'Connections', 'Current Status']
 
@@ -216,9 +220,9 @@ def process_pdf(file_data):
     sectionheadings = re.findall(pattern, text)
     sectionheadings = [x.strip() for x in sectionheadings]
 
-    # for i in range(len(sections)):
-    #     print(f"Section {i+1}: {sectionheadings[i]}")
-    #     print(sections[i])
+    for i in range(len(sections)):
+        st.write(f"Section {i+1}: {sectionheadings[i]}")
+        st.write(sections[i])
 
 
     dfSections = pd.DataFrame(sections, sectionheadings)
@@ -261,7 +265,8 @@ uploaded_file = st.file_uploader('Upload a PDF file', type='pdf')
 if uploaded_file is not None:
     file_data = io.BytesIO(uploaded_file.read())
     # Process the PDF file
-    df = process_pdf(file_data)
+    text = process_pdf(file_data)
+    df = process_text(text)
     
     # Display the DataFrame
 #     st.write(df)
