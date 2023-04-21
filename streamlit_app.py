@@ -84,8 +84,7 @@ def getClientPolicies(section):
     field01 = section
     fields = [field01]
     fields = [x.strip() for x in fields]
-    fields
-
+    
     df = pd.DataFrame(fields)
     df.index = ['Client Case Policies']
 
@@ -172,7 +171,7 @@ def getPropertyInfo(section):
 
 def process_pdf(file_data):
     
-    st.write('Uploading file')
+    st.write('Processing file...')
 
     # Open the PDF file in read binary mode
 #     pdf_file = open(uploaded_file, 'rb')
@@ -207,8 +206,8 @@ def process_pdf(file_data):
     pdf_file.close()
 
     # Print the extracted text
-    st.write(text[:100])
-    st.write(text[-100:])
+#     st.write(text[:100])
+#     st.write(text[-100:])
     
     return text
 
