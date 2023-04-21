@@ -25,7 +25,7 @@ def whichHeading(heading, content):
     elif heading == 'Employer Information':
         getEmployerInfo(content)
     else:
-        print('Unrecognized heading:', heading)
+        st.write('Unrecognized heading:', heading)
         
         
 def getNextUp(section):
@@ -170,7 +170,7 @@ def getPropertyInfo(section):
 
 def process_pdf(file_data):
     
-    print('Uploading file')
+    st.write('Uploading file')
 
     # Open the PDF file in read binary mode
 #     pdf_file = open(uploaded_file, 'rb')
@@ -190,7 +190,7 @@ def process_pdf(file_data):
 
     # Loop through each page in the PDF file
     for page in PDFPage.get_pages(pdf_file):
-        print(page)
+        st.write(page)
         # Process the current page
         pdf_interpreter.process_page(page)
 
@@ -205,8 +205,8 @@ def process_pdf(file_data):
     pdf_file.close()
 
     # Print the extracted text
-    print('Text')
-    print(text[:100])
+    st.write('Text')
+    st.write(text[:100])
 
     headings = ['Next Up', 'General Information', 'Notes', 'Client Case Policies', 'Property Information',
                 'Vehicle Information', 'Subject Information', 'Employer Information', 'Connections', 'Current Status']
