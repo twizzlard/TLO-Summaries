@@ -7,6 +7,8 @@ import io
 import re
 import pandas as pd
 
+dfList = []
+
 def whichHeading(heading, content):
     if heading == 'General Information':
         getGenInfo(content)
@@ -228,8 +230,6 @@ def process_text(text):
     dfSections = pd.DataFrame(sections, sectionheadings)
     dfSections = dfSections.reset_index()
     dfSections.columns = ['Heading', 'Content']
-
-    dfList = []
 
     # Get doc number and doc creation time
 
