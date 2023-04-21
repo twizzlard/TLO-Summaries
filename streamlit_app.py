@@ -168,10 +168,10 @@ def getPropertyInfo(section):
     dfList.append(df)
     return df
 
-def process_pdf(file):
+def process_pdf(uploaded_file):
 
     # Open the PDF file in read binary mode
-    pdf_file = open(file, 'rb')
+    pdf_file = open(uploaded_file, 'rb')
 
     # Create a PDF resource manager object
     resource_manager = PDFResourceManager()
