@@ -205,7 +205,7 @@ def process_pdf(file_data):
     pdf_file.close()
 
     # Print the extracted text
-    st.write(text[:100])
+    st.write(text)
 
     headings = ['Next Up', 'General Information', 'Notes', 'Client Case Policies', 'Property Information',
                 'Vehicle Information', 'Subject Information', 'Employer Information', 'Connections', 'Current Status']
