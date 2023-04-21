@@ -169,6 +169,8 @@ def getPropertyInfo(section):
     return df
 
 def process_pdf(file_data):
+    
+    print('Uploading file')
 
     # Open the PDF file in read binary mode
 #     pdf_file = open(uploaded_file, 'rb')
@@ -188,6 +190,7 @@ def process_pdf(file_data):
 
     # Loop through each page in the PDF file
     for page in PDFPage.get_pages(pdf_file):
+        print(page)
         # Process the current page
         pdf_interpreter.process_page(page)
 
@@ -202,6 +205,7 @@ def process_pdf(file_data):
     pdf_file.close()
 
     # Print the extracted text
+    print('Text')
     print(text[:100])
 
     headings = ['Next Up', 'General Information', 'Notes', 'Client Case Policies', 'Property Information',
