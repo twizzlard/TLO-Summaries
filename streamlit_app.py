@@ -256,6 +256,7 @@ st.title('PDF Processor')
 uploaded_file = st.file_uploader('Upload a PDF file', type='pdf')
 
 if uploaded_file is not None:
+    uploaded_file = uploaded_file.read()
     # Process the PDF file
     df = process_pdf(uploaded_file)
     
