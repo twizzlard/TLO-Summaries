@@ -27,13 +27,15 @@ def process_excel(file):
             pdf_file = f"{pdf_dir}/Entry_{index}.pdf"
             c = canvas.Canvas(pdf_file, pagesize=letter)
             width, height = letter
-
+            
             # Entry number
             c.drawString(100, height - 80, f"Entry# {index}")
-
+            
             # Add contents to the PDF
             for idx, content in enumerate(contents):
-                c.drawString(100, height - 120 - (idx * 50), f"{headings[idx+1]}: {content}")
+                c.drawString(100, height - 120 - (idx * 70), f"{headings[idx+1]}:")
+                c.drawString(100, height - 140 - (idx * 70), str(content))
+
 
             # Add the scoring section
             c.drawString(100, height - 320, "SCORING")
@@ -41,8 +43,8 @@ def process_excel(file):
             c.drawString(100, height - 360, "Solution ______/40pts max")
             c.drawString(100, height - 380, "Uniqueness ______/20pts max")
             c.drawString(100, height - 400, "Professionalism ______/10pts max")
-            c.drawString(100, height - 420, "Total Score: ___________")
-            c.drawString(100, height - 440, "NOTES:")
+            c.drawString(100, height - 440, "Total Score: ___________")
+            c.drawString(100, height - 480, "NOTES:")
 
             # Save the PDF file
             c.save()
