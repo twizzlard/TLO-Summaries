@@ -65,4 +65,14 @@ if uploaded_file is not None:
     with st.spinner("Processing..."):
         zip_path = process_excel(uploaded_file)
     st.success("Processing complete!")
-    st.markdown(f"[Download ZIP file]({zip_path})")
+    
+    # Serve the ZIP file for download
+    with open(zip_path, 'rb') as file:
+        zip_bytes = file.read()
+        st.download_button(
+            label="Download ZIP file",
+            data=zip_bytes,
+            file_name="entries.zip",
+            mime="application/zip",
+        )
+
