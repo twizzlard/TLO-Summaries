@@ -1,276 +1,68 @@
+import openpyxl
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import zipfile
+import os
 import streamlit as st
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
-import io
-import re
-import pandas as pd
+import tempfile
 
-dfList = []
+# Function to process the Excel file
+def process_excel(file):
+    workbook = openpyxl.load_workbook(file)
+    sheet = workbook.active
 
-def whichHeading(heading, content):
-    if heading == 'General Information':
-        getGenInfo(content)
-    elif heading == 'Next Up':
-        getNextUp(content)
-    elif heading == 'Notes':
-        getNotes(content)
-    elif heading == 'Client Case Policies':
-        getClientPolicies(content)
-    elif heading == 'Property Information':
-        getPropertyInfo(content)
-    elif heading == 'Vehicle Information':
-        getVehicleInfo(content)
-    elif heading == 'Subject Information':
-        getSubjectInfo(content)
-    elif heading == 'Employer Information':
-        getEmployerInfo(content)
-    elif heading in ['Connections', 'Current Status', 'Budget', 'Snapshot', 'Photo', 'Quick Links']:
-        pass
-    else:
-        st.write('Unrecognized heading:', heading)
-        
-        
-def getNextUp(section):
-    
-    secheadings = ['Next Task Due Date', 'Next Task Due', 'Subject:', 'Assigned To:']
-    
-    pattern = '|'.join(secheadings)
+    # Check headings
+    headings = ["Index", "PROBLEM", "RESEARCH", "SOLUTION", "KEYS TO SUCCESS"]
+    for idx, heading in enumerate(headings):
+        assert sheet.cell(row=1, column=idx+1).value == heading, f"Expected {heading}, but found {sheet.cell(row=1, column=idx+1).value}"
 
-    fieldcontent = re.split(pattern, section)[1:]
-    
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-    
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
+    # Temporary directory to store the PDFs
+    with tempfile.TemporaryDirectory() as pdf_dir:
+        # Iterate through the rows, starting from the second row (indexing from 1)
+        for row_idx in range(2, sheet.max_row + 1):
+            index = sheet.cell(row=row_idx, column=1).value
+            contents = [sheet.cell(row=row_idx, column=col_idx+1).value for col_idx in range(1, len(headings))]
 
-def getGenInfo(section):
-    
-    secheadings = ['Created On:', 'Due Date:', 'Referral:', 'Client:', 'Client Contact:', 'Case Type:',
-                   'Case Services:', 'Company Location:', 'Case Region:', 'Case Location:', 'Case Number:',
-                   'Claim Number:', 'SIU Number:',
-                   'Case Manager:', 'Investigator:', 'Salesperson:']
-    
-    pattern = '|'.join(secheadings)
+            # Create PDF file
+            pdf_file = f"{pdf_dir}/Entry_{index}.pdf"
+            c = canvas.Canvas(pdf_file, pagesize=letter)
+            width, height = letter
 
-    fieldcontent = re.split(pattern, section)[1:]
-    
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-        
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
+            # Entry number
+            c.drawString(100, height - 80, f"Entry# {index}")
 
-def getNotes(section):
-    
-    secheadings = ['Admin Notes:', 'Scheduling Notes:', 'Notes & Instructions:']
+            # Add contents to the PDF
+            for idx, content in enumerate(contents):
+                c.drawString(100, height - 120 - (idx * 50), f"{headings[idx+1]}: {content}")
 
-    pattern = '|'.join(secheadings)
+            # Add the scoring section
+            c.drawString(100, height - 320, "SCORING")
+            c.drawString(100, height - 340, "Research ______/30pts max")
+            c.drawString(100, height - 360, "Solution ______/40pts max")
+            c.drawString(100, height - 380, "Uniqueness ______/20pts max")
+            c.drawString(100, height - 400, "Professionalism ______/10pts max")
+            c.drawString(100, height - 420, "Total Score: ___________")
+            c.drawString(100, height - 440, "NOTES:")
 
-    fieldcontent = re.split(pattern, section)[1:]
-    
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-    
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
+            # Save the PDF file
+            c.save()
 
-def getClientPolicies(section):
-    # Get Client Case Policies section
+        # Create a ZIP file with the PDFs
+        zip_file = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+        with zipfile.ZipFile(zip_file, 'w') as zipf:
+            for root, _, files in os.walk(pdf_dir):
+                for file in files:
+                    zipf.write(os.path.join(root, file), file)
 
-    field01 = section
-    fields = [field01]
-    fields = [x.strip() for x in fields]
-    
-    df = pd.DataFrame(fields)
-    df.index = ['Client Case Policies']
+        return zip_file.name
 
-    dfList.append(df)
-    return df
+# Streamlit app
+st.title("Excel to PDF Converter")
 
-def getSubjectInfo(section):
-    
-    secheadings = ['Full Name:', 'Alias:', 'Date of Birth:', 'SSN:', 'Home Phone:', 'Cell Phone:',
-                   'Sex:', 'Race:', 'Height:', 'Weight:', 'Hair:', 'Build:', 'Eyes:', 'Glasses:',
-                   'Spouse:', 'Children:', 'Other Characteristics:', 'Drivers License\nNumber / State:',
-                   'Date of Injury:', 'Notes:', 'Injury / Limitations:', 'Street Address:'
-                  ]
-
-    pattern = '|'.join(secheadings)
-
-    fieldcontent = re.split(pattern, section)[1:]
-            
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-    field = ['Subject_' + x for x in field]
-    
-    
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
-
-def getEmployerInfo(section):
-    # Get Employer Information section
-    
-    secheadings = ['Name:', 'Occupation:', 'Is the Insured\?:', 'Ok to Contact\?:', 'Primary Contact:',
-                   'Secondary Contact:', 'Office phone:', 'Alternate Phone:', 'Fax:', 'Street Address:',
-                   'Notes:'
-                  ]    
-
-    pattern = '|'.join(secheadings)
-
-    fieldcontent = re.split(pattern, section)[1:]
-    
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-    field = ['Employer_' + x for x in field]
-    
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
-
-def getVehicleInfo(section):
-    # Get Vehicle Information section
-
-    secheadings = ['Name:', 'Year:', 'Color:', 'Make:', 'Model:', 'Tag:', 'State/Province:', 
-                   'Registered To:', 'Notes:',
-                  ]    
-
-    pattern = '|'.join(secheadings)
-
-    fieldcontent = re.split(pattern, section)[1:]
-    
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-    field = ['Vehicle_' + x for x in field]
-    
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
-
-def getPropertyInfo(section):
-    # Get Property Information section
-
-    secheadings = ['Name:', 'Street Address:', 'Notes:'
-                  ]    
-
-    pattern = '|'.join(secheadings)
-
-    fieldcontent = re.split(pattern, section)[1:]
-    
-    field = re.findall(pattern, section)
-    field = [x.strip() for x in field]
-    field = ['Property_' + x for x in field]
-    
-    df = pd.DataFrame(fieldcontent, field)
-    dfList.append(df)
-    return df
-
-def process_pdf(file_data):
-    
-    st.write('Processing file...')
-
-    # Open the PDF file in read binary mode
-#     pdf_file = open(uploaded_file, 'rb')
-    pdf_file = uploaded_file
-
-    # Create a PDF resource manager object
-    resource_manager = PDFResourceManager()
-
-    # Create a file-like buffer to receive the text
-    text_buffer = io.StringIO()
-
-    # Create a text converter object
-    text_converter = TextConverter(resource_manager, text_buffer, laparams=LAParams())
-
-    # Create a PDF interpreter object
-    pdf_interpreter = PDFPageInterpreter(resource_manager, text_converter)
-
-    # Loop through each page in the PDF file
-    for page in PDFPage.get_pages(pdf_file):
-#         st.write(page)
-        # Process the current page
-        pdf_interpreter.process_page(page)
-
-    # Get the text from the buffer
-    text = text_buffer.getvalue()
-    text = text.replace('\x0c','')
-    text = text.replace('Quick Links\nView related case updates\nView related events/tasks\nView similar subjects','')
-    text = text.replace('Photo','')
-
-    # Close the buffer and the PDF file
-    text_buffer.close()
-    pdf_file.close()
-
-    # Print the extracted text
-#     st.write(text[:100])
-#     st.write(text[-100:])
-    
-    return text
-
-def process_text(text):
-    headings = ['Next Up', 'General Information', 'Notes', 'Client Case Policies', 'Property Information',
-                'Vehicle Information', 'Subject Information', 'Employer Information', 'Connections', 'Current Status']
-
-    pattern = '\n|\n'.join(headings)
-
-    sections = re.split(pattern, text)[1:]
-    sectionheadings = re.findall(pattern, text)
-    sectionheadings = [x.strip() for x in sectionheadings]
-
-#     for i in range(len(sections)):
-#         st.write(f"Parsing Section {i+1}: {sectionheadings[i]}")
-
-
-    dfSections = pd.DataFrame(sections, sectionheadings)
-    dfSections = dfSections.reset_index()
-    dfSections.columns = ['Heading', 'Content']
-
-    # Get doc number and doc creation time
-
-    field01 = re.search('([A-Z0-9\-]+) \(This document was generated on: (\d+/\d+/\d{2} \d+:\d{2} (?:AM|PM))\)', 
-                        text, flags=re.DOTALL)[1]
-    field02 = re.search('([A-Z0-9\-]+) \(This document was generated on: (\d+/\d+/\d{2} \d+:\d{2} (?:AM|PM))\)', 
-                        text, flags=re.DOTALL)[2]
-
-    fields = [field01, field02]
-
-    fields = [x.strip() for x in fields]
-    
-    df = pd.DataFrame(fields)
-
-    df.index = ['Document Number', 'Document Creation Date/Time'
-               ]
-    
-    dfList.append(df)
-    
-    dfSections.apply(lambda x: whichHeading(x['Heading'], x['Content']), axis=1)
-    
-    df = pd.concat(dfList)
-    
-    df[0] = df[0].str.strip()
-    
-    df = df.T
-
-    return df.to_csv(index=False).encode('utf-8')
-    
-st.title('PDF Processor')
-uploaded_file = st.file_uploader('Upload a PDF file', type='pdf')
+uploaded_file = st.file_uploader("Drag and drop your Excel file here:", type=["xlsx"])
 
 if uploaded_file is not None:
-    file_data = io.BytesIO(uploaded_file.read())
-    # Process the PDF file
-    text = process_pdf(file_data)
-    df = process_text(text)
-    
-    # Display the DataFrame
-#     st.write(df)
-    
-    # Offer a download link for the CSV file
-    st.markdown('### Download CSV')
-    st.download_button('Download CSV', data=df, file_name='output.csv')
+    with st.spinner("Processing..."):
+        zip_path = process_excel(uploaded_file)
+    st.success("Processing complete!")
+    st.markdown(f"[Download ZIP file]({zip_path})")
