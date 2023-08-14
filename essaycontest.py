@@ -43,8 +43,8 @@ def process_excel(file):
             c.drawString(100, height - 360, "Solution ______/40pts max")
             c.drawString(100, height - 380, "Uniqueness ______/20pts max")
             c.drawString(100, height - 400, "Professionalism ______/10pts max")
-            c.drawString(100, height - 440, "Total Score: ___________")
-            c.drawString(100, height - 480, "NOTES:")
+            c.drawString(100, height - 420, "Total Score: ___________")
+            c.drawString(100, height - 440, "NOTES:")
 
             # Save the PDF file
             c.save()
